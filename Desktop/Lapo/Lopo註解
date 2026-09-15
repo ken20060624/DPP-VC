@@ -6,15 +6,11 @@
   ],
   /*宣告數據字典」。告訴掃描或讀取這份資料的系統*/
 
-  "id": "urn:uuid:a1b2c3d4-e5f6-7890-1234-56789abcdef0",
-  "type": ["DigitalProductPassport", "VerifiableCredential"],
-  "issuer": "did:web:dpp.lapo.com.tw",
-  "issuanceDate": "2026-03-15T00:00:00Z",
-  /* id： 這份護照文件的全球唯一身分碼（UUID）。
-    type： 聲明這份文件既是 DPP（數位產品護照），也是一張 VC（可驗證憑證）。
-    issuer： 發照者 ID（DID）。這裡代表這是由 LaPO 官方網域 (dpp.lapo.com.tw) 加密簽發的正版聲明。
-    issuanceDate： 發照時間（2026年3月15日）。
-    */
+  "id": "urn:uuid:a1b2c3d4-e5f6-7890-1234-56789abcdef0",/* id： 這份護照文件的全球唯一身分碼（UUID*/
+  "type": ["DigitalProductPassport", "VerifiableCredential"],/* type： 聲明這份文件既是 DPP（數位產品護照），也是一張 VC（可驗證憑證）*/
+  "issuer": "did:web:dpp.lapo.com.tw",/*issuer： 發照者 ID（DID）。這裡代表這是由 LaPO 官方網域 (dpp.lapo.com.tw) 加密簽發的正版聲明。*/
+  "issuanceDate": "2026-03-15T00:00:00Z",/*issuanceDate： 發照時間（2026年3月15日）。*/
+
   "credentialSubject": {
     "id": "urn:gtin:04710000000000:SN202603001",/*產品識別碼*/
     "productName": "LaPO 多功能多角度手持風扇",/*產品名稱*/
