@@ -10,8 +10,8 @@
   "issuanceDate": "2026-03-15T00:00:00Z",
   "credentialSubject": {
     "id": "urn:gtin:04710000000000:SN202603001",
-    "productName": "LaPO 多功能多角度手持風扇",
-    "modelNumber": "LA-F1",
+    "productName": "LaPO 迷你渦輪隨身風扇",
+    "modelNumber": "LF-02",
     "brand": "LaPO",
     "countryOfOrigin": "TW",
     "documentation": {
@@ -20,20 +20,20 @@
     },
     "batteryComponent": {
       "supplierDid": "did:web:cert.battery-supplier.com",
-      "chemistry": "Li-ion (18650/21700)",
-      "capacityMah": 2000,
+      "chemistry": "Li-ion",
+      "capacityMah": 5100,
       "voltageV": 3.7,
-      "energyWh": 7.4,
-      "certifications": ["BSMI CI310000000000", "UN38.3", "CE", "FCC"],
+      "energyWh": 18.87,
+      "certifications": ["BSMI", "UN38.3", "CE", "FCC"],
       "criticalRawMaterials": {
-        "cobaltGrams": 0.85,
-        "lithiumGrams": 0.22
+        "cobaltGrams": 2.1,
+        "lithiumGrams": 0.56
       }
     },
     "environmentalMetrics": {
-      "carbonFootprintKgCO2e": 1.85,
+      "carbonFootprintKgCO2e": 2.10,
       "pcrPlasticPercentage": 25.0,
-      "recyclabilityPercentage": 85.0,
+      "recyclabilityPercentage": 88.0,
       "rohsCompliant": true,
       "reachCompliant": true
     }
