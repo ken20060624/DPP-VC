@@ -5,12 +5,11 @@
 ## 📌 專案功能
 
 - 🔗 QR Code 綁定實體產品
-- 📦 GS1 Digital Link 產品識別與路由
+- 📦 GS1 Digital Link 產品識別與路由解析
 - 🌱 DPP 產品資料管理
-- 🔐 W3C DID / VC 資料簽發與驗證
-- 🔋 電池與產品合規資訊
-- 📊 碳足跡、再生材料等環保資訊
-- 📱 Mobile-first DPP 展示頁面
+- 🔐 W3C DID / VC 資料簽發與密碼學驗證
+- 🔋 電池合規、碳足跡等環保資訊展示
+- 📱 Mobile-first DPP 移動端展示頁面
 
 ## 🏗️ 系統架構
 
@@ -32,52 +31,37 @@ Web UI
 
 | 分支 | 負責內容 |
 | :--- | :--- |
-| `feature/gs1` | QR Code、GS1 Digital Link、產品路由 |
-| `feature/dpp` | DPP 資料模型、產品資料、Mock Data |
-| `feature/vc` | DID、VC 簽發與驗證 |
-| `feature/ui` | 前端介面、產品資訊、VC 驗證結果 |
-| `dev` | 整合與測試 |
+| `feature/gs1` | QR Code 批次產出、GS1 Digital Link 路由 |
+| `feature/dpp` | DPP 資料模型、產品規格資料 |
+| `feature/vc` | DID、VC 簽發與驗證邏輯 |
+| `feature/ui` | 前端介面、展示卡片與驗證狀態反饋 |
+| `dev` | 功能整合與測試 |
 | `main` | 最終展示版本 |
 
 > ⚠️ **禁止直接 Push 到 `dev` 或 `main`。**  
-> 所有功能請在自己的 `feature/*` 分支開發，完成後建立 PR 合併至 `dev`。
+> 所有功能請在各自分支開發完成後，透過 Pull Request 合併。
 
-## 🛠️ 開發流程
+## 🛠️ 本地開發與展示步驟
 
-1. **更新 dev**
+1. **啟動虛擬環境並安裝相依套件**
 ```bash
-git checkout dev
-git pull origin dev
+source venv/bin/activate
+pip install qrcode pillow
 ```
 
-2. **切換自己的分支**
+2. **產生 GS1 QR Code**
 ```bash
-git checkout feature/<你的分支>
+python scripts/generate_qr.py
 ```
 
-3. **同步最新 dev**
+3. **啟動本地 HTTP 伺服器**
 ```bash
-git merge dev
+python -m http.server 3000 --bind 127.0.0.1
 ```
 
-4. **開發並提交**
+4. **開啟內網穿透（供手機相機掃描實測）**
 ```bash
-git add .
-git commit -m "feat: 新增功能"
-git push origin feature/<你的分支>
-```
-
-5. **建立 Pull Request**
-```text
-feature/*
-    ↓
-Pull Request
-    ↓
-   dev
-    ↓
-   測試
-    ↓
-  main
+npx localtunnel --port 3000
 ```
 
 ## 📋 Commit 格式
