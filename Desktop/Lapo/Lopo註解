@@ -1,45 +1,9 @@
-{
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://schema.org",
-    "https://dpp.eu/schemas/v1/portable-fan.jsonld"
-  ],
-  /*宣告數據字典」。告訴掃描或讀取這份資料的系統*/
+LaPO 商品 Mock Data 說明
 
-  "id": "urn:uuid:a1b2c3d4-e5f6-7890-1234-56789abcdef0",/* id： 這份護照文件的全球唯一身分碼（UUID*/
-  "type": ["DigitalProductPassport", "VerifiableCredential"],/* type： 聲明這份文件既是 DPP（數位產品護照），也是一張 VC（可驗證憑證）*/
-  "issuer": "did:web:dpp.lapo.com.tw",/*issuer： 發照者 ID（DID）。這裡代表這是由 LaPO 官方網域 (dpp.lapo.com.tw) 加密簽發的正版聲明。*/
-  "issuanceDate": "2026-03-15T00:00:00Z",/*issuanceDate： 發照時間（2026年3月15日）。*/
-
-  "credentialSubject": {
-    "id": "urn:gtin:04710000000000:SN202603001",/*產品識別碼*/
-    "productName": "LaPO 多功能多角度手持風扇",/*產品名稱*/
-    "modelNumber": "LA-F1",/*型號*/
-    "brand": "LaPO",/*品牌名稱*/
-    "countryOfOrigin": "TW",/*原產地*/
-    "documentation": {
-      "userManual": "https://www.lapo.com.tw/manuals/LA-F1-manual.pdf",/*使用說明書*/
-      "repairGuide": "https://www.lapo.com.tw/service/LA-F1-repair.pdf" /*維修指南*/
-    },
-    
-    "batteryComponent": {
-      "supplierDid": "did:web:cert.battery-supplier.com",/*電池供應商 DID */
-      "chemistry": "Li-ion (18650/21700)",/*電池化學成分*/
-      "capacityMah": 2000,/*容量（mAh）*/
-      "voltageV": 3.7,/*電壓（V）*/
-      "energyWh": 7.4,/*能量（Wh）*/
-      "certifications": ["BSMI CI310000000000", "UN38.3", "CE", "FCC"],/*認證*/ 
-      "criticalRawMaterials": {
-        "cobaltGrams": 0.85,
-        "lithiumGrams": 0.22
-      }
-    },
-    "environmentalMetrics": {
-      "carbonFootprintKgCO2e": 1.85,/*風扇所產生的碳足跡*/
-      "pcrPlasticPercentage": 25.0,/*機身塑膠使用了 25% 的 PCR*/
-      "recyclabilityPercentage": 85.0,/*85% 的材料是可回收再利用的*/
-      "rohsCompliant": true,/*符合 RoHS 指令*/
-      "reachCompliant": true/*符合 REACH 規範*/
-    }
-  }
-}
+1. `lapo.java` 的內容是 JSON 商品資料，不是 Java source code。
+2. 商品資料（DPP）與 Verifiable Credential（VC）分開保存。
+3. `id` 是跨 GS1、DPP、VC、UI 共用的 canonical Product ID。
+4. `gtin` 必須是 14 位並通過 GS1 Mod-10 檢查碼。
+5. VC Issuer 會把此商品物件放入 `credentialSubject` 並簽署完整內容。
+6. 簽章成功只證明指定 Issuer 發出且內容未被修改，不代表 SGS 或法規背書。
+7. 正式展示前必須將 Demo GTIN 換成獲授權的真實 GTIN。

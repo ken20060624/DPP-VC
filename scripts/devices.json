@@ -1,22 +1,22 @@
 [
   {
     "id": "FAN-001",
-    "name": "手持渦輪風扇 (正常合規品)",
-    "gtin": "047199990001",
+    "name": "手持渦輪風扇（簽章驗證示範）",
+    "gtin": "00047199990002",
     "serialNumber": "FAN-2026-001",
-    "status": "VALID",
-    "description": "通過 SGS 碳足跡與電池安全 VC 驗證",
-    "targetUrl": "https://dpp-demo.example.com/01/047199990001/21/FAN-2026-001",
+    "status": "SIGNATURE_VALID",
+    "description": "示範憑證簽章有效且內容未遭竄改；不代表 SGS 或法規合規背書",
+    "targetUrl": "https://dpp-demo.example.com/01/00047199990002/21/FAN-2026-001",
     "qrImagePath": "/public/qrcodes/FAN-001_FAN-2026-001.png"
   },
   {
     "id": "FAN-002",
-    "name": "手持渦輪風扇 (仿冒異常品)",
-    "gtin": "047199990001",
+    "name": "手持渦輪風扇（內容竄改示範）",
+    "gtin": "00047199990002",
     "serialNumber": "FAN-2026-002",
-    "status": "INVALID",
-    "description": "VC 憑證被撤銷或碳足跡數據遭竄改",
-    "targetUrl": "https://dpp-demo.example.com/01/047199990001/21/FAN-2026-002",
+    "status": "SIGNATURE_INVALID",
+    "description": "示範憑證內容遭竄改，因此密碼學簽章驗證失敗",
+    "targetUrl": "https://dpp-demo.example.com/01/00047199990002/21/FAN-2026-002",
     "qrImagePath": "/public/qrcodes/FAN-002_FAN-2026-002.png"
   }
 ]

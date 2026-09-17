@@ -11,6 +11,20 @@ output_dir = os.path.join(os.path.dirname(__file__), "../public/qrcodes")
 
 os.makedirs(output_dir, exist_ok=True)
 
+
+def is_valid_gtin_14(gtin):
+    if len(gtin) != 14 or not gtin.isdigit():
+        return False
+
+    body = [int(digit) for digit in gtin[:-1]]
+    total = 0
+    weight = 3
+    for digit in reversed(body):
+        total += digit * weight
+        weight = 1 if weight == 3 else 3
+    expected_check_digit = (10 - (total % 10)) % 10
+    return expected_check_digit == int(gtin[-1])
+
 with open(devices_file, "r", encoding="utf-8") as f:
     devices = json.load(f)
 
@@ -19,6 +33,9 @@ print("=== 開始產出手持電風扇 GS1 Digital Link QR Code ===")
 for fan in devices:
     gtin = fan["gtin"]
     serial = fan["serialNumber"]
+
+    if not is_valid_gtin_14(gtin):
+        raise ValueError(f"[{fan['id']}] GTIN 必須是通過檢查碼的 14 位數字")
     
     # 組合 GS1 Digital Link 標準 URL
     # 格式：https://domain/01/{GTIN}/21/{Serial}

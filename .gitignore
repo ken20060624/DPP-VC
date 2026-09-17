@@ -1,1 +1,16 @@
 venv/
+.npm-cache/
+vc-issuer/node_modules/
+vc-issuer/dist/
+vc-issuer/.env
+vc-issuer/secrets/*
+!vc-issuer/secrets/.gitkeep
+vc-issuer/data/credentials/*.json
+vc-issuer/data/credentials/*.tmp
+!vc-issuer/data/credentials/.gitkeep
+vc-issuer/data/status/assignments/*.json
+vc-issuer/data/status/revocations/*.json
+vc-issuer/data/status/**/*.tmp
+!vc-issuer/data/status/assignments/.gitkeep
+!vc-issuer/data/status/revocations/.gitkeep
+vc-issuer/coverage/
