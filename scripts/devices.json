@@ -6,7 +6,7 @@
     "serialNumber": "FAN-2026-001",
     "status": "VALID",
     "description": "通過 SGS 碳足跡與電池安全 VC 驗證",
-    "targetUrl": "https://dpp-demo.example.com/01/047199990001/21/FAN-2026-001",
+    "targetUrl": "https://thin-boxes-build.loca.lt/index.html?gtin=047199990001&serial=FAN-2026-001",
     "qrImagePath": "/public/qrcodes/FAN-001_FAN-2026-001.png"
   },
   {
@@ -16,7 +16,7 @@
     "serialNumber": "FAN-2026-002",
     "status": "INVALID",
     "description": "VC 憑證被撤銷或碳足跡數據遭竄改",
-    "targetUrl": "https://dpp-demo.example.com/01/047199990001/21/FAN-2026-002",
+    "targetUrl": "https://thin-boxes-build.loca.lt/index.html?gtin=047199990001&serial=FAN-2026-002",
     "qrImagePath": "/public/qrcodes/FAN-002_FAN-2026-002.png"
   }
 ]

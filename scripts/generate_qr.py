@@ -2,10 +2,9 @@ import json
 import os
 import qrcode
 
-# 基礎網址設定（展示時可改為 ngrok 或真實部署網址）
-BASE_URL = "https://dpp-demo.example.com"
+# 設定穿透網址，直接帶上 index.html
+BASE_URL = "https://thin-boxes-build.loca.lt/index.html"
 
-# 載入設備清單
 devices_file = os.path.join(os.path.dirname(__file__), "devices.json")
 output_dir = os.path.join(os.path.dirname(__file__), "../public/qrcodes")
 
@@ -14,18 +13,17 @@ os.makedirs(output_dir, exist_ok=True)
 with open(devices_file, "r", encoding="utf-8") as f:
     devices = json.load(f)
 
-print("=== 開始產出手持電風扇 GS1 Digital Link QR Code ===")
+print("=== 開始產出手持電風扇 GS1 QR Code ===")
 
 for fan in devices:
     gtin = fan["gtin"]
     serial = fan["serialNumber"]
     
-    # 組合 GS1 Digital Link 標準 URL
-    # 格式：https://domain/01/{GTIN}/21/{Serial}
-    gs1_url = f"{BASE_URL}/01/{gtin}/21/{serial}"
+    # 組合完整帶有參數的網址
+    gs1_url = f"{BASE_URL}?gtin={gtin}&serial={serial}"
     fan["targetUrl"] = gs1_url
     
-    # 建立 QR Code
+    # 產生 QR Code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
