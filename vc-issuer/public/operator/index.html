@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DPP-VC 憑證簽發、驗證與撤銷操作台">
+  <title>DPP-VC 憑證操作台</title>
+  <link rel="stylesheet" href="/operator/styles.css">
+  <script src="/operator/app.js" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/operator/" aria-label="DPP-VC 操作台首頁">
+        <span class="brand-mark" aria-hidden="true">VC</span>
+        <span>
+          <strong>DPP Credential Lab</strong>
+          <small>Product passport issuer console</small>
+        </span>
+      </a>
+      <div id="serviceStatus" class="service-status is-checking" aria-live="polite">
+        <span class="status-dot"></span>
+        <span>正在連線</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">VERIFIABLE CREDENTIAL WORKBENCH</p>
+          <h1>從產品資料到<br><span>可驗證憑證</span></h1>
+          <p class="hero-copy">
+            用一個畫面完成簽發、驗證、竄改測試與撤銷，展示資料如何被真實的
+            Ed25519 數位簽章保護。
+          </p>
+        </div>
+        <div class="trust-card" aria-label="目前安全設定">
+          <div class="trust-card-head">
+            <span class="shield" aria-hidden="true">✓</span>
+            <div>
+              <small>SECURITY PROFILE</small>
+              <strong>W3C VC 2.0</strong>
+            </div>
+          </div>
+          <dl>
+            <div><dt>Proof</dt><dd>Data Integrity</dd></div>
+            <div><dt>Suite</dt><dd>eddsa-jcs-2022</dd></div>
+            <div><dt>Status</dt><dd>Bitstring List</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="workflow" aria-label="操作流程">
+        <div class="workflow-step is-active"><span>01</span><p>連線與授權</p></div>
+        <div class="workflow-line"></div>
+        <div class="workflow-step"><span>02</span><p>產品資料</p></div>
+        <div class="workflow-line"></div>
+        <div class="workflow-step"><span>03</span><p>簽發 VC</p></div>
+        <div class="workflow-line"></div>
+        <div class="workflow-step"><span>04</span><p>驗證結果</p></div>
+      </section>
+
+      <div class="dashboard-grid">
+        <div class="input-column">
+          <section class="panel connection-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-number">01 / CONNECTION</p>
+                <h2>服務與操作授權</h2>
+              </div>
+              <button id="refreshReady" class="icon-button" type="button" title="重新檢查服務">
+                ↻
+              </button>
+            </div>
+
+            <div id="issuerFacts" class="issuer-facts">
+              <div><span>Issuer</span><strong>等待服務回應</strong></div>
+              <div><span>DID method</span><strong>—</strong></div>
+              <div><span>Cryptosuite</span><strong>—</strong></div>
+            </div>
+
+            <label class="field full-field">
+              <span>Operator API Key</span>
+              <div class="secret-field">
+                <input id="apiKey" type="password" autocomplete="off"
+                  placeholder="只在簽發與撤銷時使用">
+                <button id="toggleApiKey" type="button" aria-label="顯示或隱藏 API Key">顯示</button>
+              </div>
+              <small>金鑰只保留在目前頁面，不會寫入瀏覽器儲存空間。</small>
+            </label>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-number">02 / PRODUCT DATA</p>
+                <h2>產品護照資料</h2>
+              </div>
+              <button id="loadDemo" class="text-button" type="button">載入 Demo</button>
+            </div>
+
+            <form id="productForm">
+              <div class="field-grid">
+                <label class="field full-field">
+                  <span>GS1 Digital Link</span>
+                  <input id="productId" type="url" required>
+                </label>
+                <label class="field">
+                  <span>GTIN-14</span>
+                  <input id="gtin" inputmode="numeric" pattern="[0-9]{14}" maxlength="14" required>
+                </label>
+                <label class="field">
+                  <span>Serial Number</span>
+                  <input id="serialNumber" maxlength="20" required>
+                </label>
+                <label class="field full-field">
+                  <span>產品名稱</span>
+                  <input id="productName" maxlength="200" required>
+                </label>
+                <label class="field">
+                  <span>品牌</span>
+                  <input id="brand" maxlength="100" required>
+                </label>
+                <label class="field">
+                  <span>型號</span>
+                  <input id="modelNumber" maxlength="100" required>
+                </label>
+                <label class="field">
+                  <span>原產國</span>
+                  <input id="countryOfOrigin" pattern="[A-Z]{2}" maxlength="2" required>
+                </label>
+                <label class="field">
+                  <span>電池化學成分</span>
+                  <input id="chemistry" maxlength="100" required>
+                </label>
+                <label class="field">
+                  <span>電池容量 mAh</span>
+                  <input id="capacityMah" type="number" min="0.01" step="0.01" required>
+                </label>
+                <label class="field">
+                  <span>電池電壓 V</span>
+                  <input id="voltageV" type="number" min="0.01" step="0.01" required>
+                </label>
+                <label class="field">
+                  <span>電池能量 Wh</span>
+                  <input id="energyWh" type="number" min="0.01" step="0.01" required>
+                </label>
+                <label class="field">
+                  <span>碳足跡 kgCO₂e</span>
+                  <input id="carbonFootprint" type="number" min="0" step="0.01" required>
+                </label>
+                <label class="field">
+                  <span>PCR 再生塑膠 %</span>
+                  <input id="pcrPlastic" type="number" min="0" max="100" step="0.01" required>
+                </label>
+                <label class="field">
+                  <span>可回收比例 %</span>
+                  <input id="recyclability" type="number" min="0" max="100" step="0.01" required>
+                </label>
+              </div>
+              <div class="compliance-row">
+                <label><input id="rohsCompliant" type="checkbox"> RoHS compliant</label>
+                <label><input id="reachCompliant" type="checkbox"> REACH compliant</label>
+              </div>
+            </form>
+
+            <div class="primary-actions">
+              <button id="issueCredential" class="primary-button" type="button">
+                <span>簽發並立即驗證</span><span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="result-column">
+          <section class="panel result-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-number">03 / VERIFICATION</p>
+                <h2>憑證與驗證結果</h2>
+              </div>
+              <span id="verificationBadge" class="verification-badge is-empty">尚未驗證</span>
+            </div>
+
+            <div id="resultEmpty" class="empty-state">
+              <div class="empty-symbol" aria-hidden="true">◇</div>
+              <h3>等待簽發憑證</h3>
+              <p>載入 Demo 資料並按下「簽發並立即驗證」，結果會顯示在這裡。</p>
+            </div>
+
+            <div id="verificationResult" class="verification-result" hidden>
+              <div class="credential-meta">
+                <div><span>Credential ID</span><strong id="credentialId">—</strong></div>
+                <div><span>Subject</span><strong id="subjectId">—</strong></div>
+              </div>
+              <div id="checksGrid" class="checks-grid"></div>
+              <div id="errorList" class="error-list" hidden></div>
+            </div>
+
+            <div class="credential-editor">
+              <div class="editor-toolbar">
+                <span>Credential JSON</span>
+                <div>
+                  <button id="copyCredential" type="button">複製</button>
+                  <button id="clearCredential" type="button">清除</button>
+                </div>
+              </div>
+              <textarea id="credentialJson" spellcheck="false"
+                placeholder="簽發後的 VC JSON，或貼上既有 VC 進行驗證"></textarea>
+            </div>
+
+            <div class="secondary-actions">
+              <button id="verifyCredential" type="button">驗證目前 JSON</button>
+              <button id="tamperCredential" class="warning-button" type="button">製造竄改副本</button>
+              <button id="restoreCredential" type="button">還原原始 VC</button>
+              <button id="revokeCredential" class="danger-button" type="button">撤銷原始 VC</button>
+            </div>
+          </section>
+
+          <section class="panel activity-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="section-number">ACTIVITY</p>
+                <h2>操作紀錄</h2>
+              </div>
+              <button id="clearActivity" class="text-button" type="button">清除</button>
+            </div>
+            <ol id="activityLog" class="activity-log" aria-live="polite">
+              <li class="muted-log">尚無操作紀錄</li>
+            </ol>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DPP-VC 小專題操作介面</span>
+      <span>簽章有效不等於商品或法規聲明已經獨立查核</span>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
