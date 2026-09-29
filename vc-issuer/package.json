@@ -1,0 +1,42 @@
+{
+  "name": "dpp-vc-issuer",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12 <23"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/src/server.js",
+    "generate-api-key": "tsx scripts/generate-api-key.ts",
+    "generate-key": "tsx scripts/generate-key.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@digitalbazaar/credentials-context": "3.2.0",
+    "@digitalbazaar/data-integrity": "2.5.0",
+    "@digitalbazaar/data-integrity-context": "2.0.1",
+    "@digitalbazaar/ed25519-multikey": "1.3.1",
+    "@digitalbazaar/eddsa-jcs-2022-cryptosuite": "1.0.0",
+    "@digitalbazaar/multikey-context": "2.0.1",
+    "@fastify/cors": "11.3.0",
+    "did-context": "3.1.1",
+    "dotenv": "17.4.2",
+    "fastify": "5.12.5",
+    "jsonld-signatures": "11.6.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.3",
+    "@types/pngjs": "^6.0.5",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
+  }
+}

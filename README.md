@@ -87,3 +87,36 @@ npx localtunnel --port 3000
       ↓
 ✅ 確認資料可信
 ```
+
+## 🔐 VC Issuer 第二階段
+
+可執行的 VC 2.0 簽發與驗證服務位於 [`vc-issuer/`](vc-issuer/)。
+
+### Windows 一鍵啟動
+
+直接雙擊專案根目錄的 [`啟動-VC操作台.bat`](啟動-VC操作台.bat)。第一次啟動會
+自動安裝套件、建立本機 Issuer 金鑰與 Operator API Key，之後會啟動服務並開啟
+`http://127.0.0.1:3000/operator/`。
+
+啟動器會把 Operator API Key 複製到剪貼簿；在操作台的 API Key 欄位按
+`Ctrl+V` 即可。Key 只保存在被 Git 忽略的
+`vc-issuer/secrets/operator-api-key.txt`，不會寫入網頁或版本庫。
+
+```bash
+cd vc-issuer
+npm ci
+npm run generate-key
+npm run generate-api-key
+npm test
+npm run dev
+```
+
+目前服務已加入簽發／撤銷授權、W3C Bitstring Status List v1.0、`did:web`
+provider 與公開 DID/context 路由。它能驗證 Issuer 來源、credential 完整性與
+撤銷狀態，但仍不代表商品已通過 SGS 或法規合規審查。完整操作與安全邊界請見
+[`vc-issuer/README.md`](vc-issuer/README.md)。
+
+執行計畫：
+
+- [`VC-Issuer-第一階段實作計畫-v2.md`](VC-Issuer-第一階段實作計畫-v2.md)
+- [`VC-Issuer-第二階段實作計畫.md`](VC-Issuer-第二階段實作計畫.md)
