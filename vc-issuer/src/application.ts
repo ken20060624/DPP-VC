@@ -3,6 +3,7 @@ import path from 'node:path';
 import cors from '@fastify/cors';
 import Fastify, {
   type FastifyInstance,
+  type FastifyReply,
   type FastifyRequest
 } from 'fastify';
 import type {AppConfig} from './config.js';
@@ -159,6 +160,8 @@ export async function buildApplication(
     }
   });
 
+  registerOperatorUiRoutes(app);
+
   app.get('/health', async () => ({status: 'ok'}));
 
   app.get('/ready', async (_request, reply) => {
@@ -292,6 +295,50 @@ export async function buildApplication(
   });
 
   return app;
+}
+
+function registerOperatorUiRoutes(app: FastifyInstance): void {
+  app.get('/operator', async (_request, reply) =>
+    reply.redirect('/operator/')
+  );
+  app.get('/operator/', async (_request, reply) =>
+    sendOperatorUiAsset(reply, 'index.html', 'text/html; charset=utf-8')
+  );
+  app.get('/operator/styles.css', async (_request, reply) =>
+    sendOperatorUiAsset(reply, 'styles.css', 'text/css; charset=utf-8')
+  );
+  app.get('/operator/app.js', async (_request, reply) =>
+    sendOperatorUiAsset(
+      reply,
+      'app.js',
+      'text/javascript; charset=utf-8'
+    )
+  );
+}
+
+async function sendOperatorUiAsset(
+  reply: FastifyReply,
+  fileName: 'index.html' | 'styles.css' | 'app.js',
+  contentType: string
+): Promise<FastifyReply> {
+  const assetPath = path.join(PROJECT_ROOT, 'public', 'operator', fileName);
+  const content = await readFile(assetPath, 'utf8');
+  return reply
+    .header('Cache-Control', 'no-store')
+    .header('Content-Security-Policy', [
+      "default-src 'self'",
+      "connect-src 'self'",
+      "img-src 'self' data:",
+      "style-src 'self'",
+      "script-src 'self'",
+      "base-uri 'none'",
+      "form-action 'none'",
+      "frame-ancestors 'none'"
+    ].join('; '))
+    .header('Referrer-Policy', 'no-referrer')
+    .header('X-Content-Type-Options', 'nosniff')
+    .type(contentType)
+    .send(content);
 }
 
 function requireServices(services: Services | undefined): Services {

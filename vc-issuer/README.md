@@ -116,6 +116,23 @@ Invoke-RestMethod http://127.0.0.1:3000/ready
 `/health` 只表示 process 存活；`/ready` 會回報 issuer、DID method、cryptosuite
 與 status-list URL。
 
+### 操作網頁
+
+服務啟動後開啟 `http://127.0.0.1:3000/operator/`，可在同一頁面完成：
+
+- 載入示範產品資料；
+- 使用 Operator API Key 簽發 VC；
+- 驗證簽章、Issuer 與撤銷狀態；
+- 產生竄改副本並觀察驗證失敗；
+- 撤銷原始 VC 後再次驗證。
+
+網頁不會把 Operator API Key 寫入 `localStorage` 或 `sessionStorage`，重新載入
+頁面後需重新輸入。
+
+Windows 使用者也可以直接雙擊專案根目錄的 `啟動-VC操作台.bat`。第一次執行會
+自動準備本機開發環境；之後每次啟動會將保存在 `secrets/operator-api-key.txt`
+的本機 Key 複製到剪貼簿，並在服務就緒後開啟操作台。
+
 ## 完整 Demo
 
 先把一次性產生並安全保存的 plaintext operator key 輸入目前 PowerShell session：

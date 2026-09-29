@@ -8,6 +8,7 @@ import {
   createTestWorkspace,
   loadFanFixture,
   TEST_AUTHORIZATION,
+  TEST_OPERATOR_API_KEY,
   type TestWorkspace
 } from './helpers.js';
 
@@ -246,6 +247,42 @@ describe('VC issuer HTTP flow', () => {
         method: 'GET',
         url: '/.well-known/did.json'
       })).statusCode).toBe(404);
+    });
+
+  it('serves the operator UI with restrictive browser security headers',
+    async () => {
+      const {app} = await setup();
+      const redirect = await app.inject({method: 'GET', url: '/operator'});
+      expect(redirect.statusCode).toBe(302);
+      expect(redirect.headers.location).toBe('/operator/');
+
+      const page = await app.inject({method: 'GET', url: '/operator/'});
+      expect(page.statusCode).toBe(200);
+      expect(page.headers['content-type']).toContain('text/html');
+      expect(page.headers['cache-control']).toBe('no-store');
+      expect(page.headers['content-security-policy']).toContain(
+        "default-src 'self'"
+      );
+      expect(page.headers['content-security-policy']).toContain(
+        "frame-ancestors 'none'"
+      );
+      expect(page.body).toContain('DPP-VC 憑證操作台');
+      expect(page.body).not.toContain(TEST_OPERATOR_API_KEY);
+
+      const script = await app.inject({
+        method: 'GET',
+        url: '/operator/app.js'
+      });
+      expect(script.statusCode).toBe(200);
+      expect(script.headers['content-type']).toContain('text/javascript');
+      expect(script.body).toContain('/api/v1/credentials/issue');
+
+      const styles = await app.inject({
+        method: 'GET',
+        url: '/operator/styles.css'
+      });
+      expect(styles.statusCode).toBe(200);
+      expect(styles.headers['content-type']).toContain('text/css');
     });
 
   it('publishes a secret-free did:web document in web mode', async () => {
