@@ -102,6 +102,22 @@ npx localtunnel --port 3000
 `Ctrl+V` 即可。Key 只保存在被 Git 忽略的
 `vc-issuer/secrets/operator-api-key.txt`，不會寫入網頁或版本庫。
 
+### macOS / Docker 啟動
+
+安裝並啟動 Docker Desktop，在專案根目錄執行：
+
+```sh
+docker compose up --build -d
+docker compose ps
+docker compose exec -T issuer cat /app/secrets/operator-api-key.txt
+```
+
+開啟 `http://127.0.0.1:3000/operator/`，將第三個指令顯示的 Key 貼到第 1 頁，
+按「驗證授權並前往產品資料」。用 `docker compose down` 停止。Docker 使用自己的
+`issuer_secrets`、`issuer_data` 命名儲存卷，重啟後會保留金鑰、VC 與撤銷紀錄；
+不要使用 `docker compose down -v`，除非確定要刪除它們。Docker 與 `.bat` 的
+本機資料相互獨立。詳細說明見 [`vc-issuer/README.md`](vc-issuer/README.md)。
+
 ```bash
 cd vc-issuer
 npm ci

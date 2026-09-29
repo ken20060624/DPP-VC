@@ -39,15 +39,19 @@ describe('cross-branch GS1 fixtures', () => {
       };
       expect(devices[0]).toMatchObject({
         gtin: canonical.gtin,
-        serialNumber: canonical.serialNumber,
-        targetUrl: canonical.id
+        serialNumber: canonical.serialNumber
       });
+      expect(new URL(canonical.id).pathname).toBe(
+        `/01/${canonical.gtin}/21/${canonical.serialNumber}`
+      );
 
       for(const device of devices) {
         expect(hasValidGtinCheckDigit(device.gtin)).toBe(true);
-        expect(device.targetUrl).toBe(
-          `https://dpp-demo.example.com/01/${device.gtin}/21/${device.serialNumber}`
-        );
+        const target = new URL(device.targetUrl);
+        expect(target.protocol).toBe('https:');
+        expect(target.pathname).toBe('/index.html');
+        expect(target.searchParams.get('gtin')).toBe(device.gtin);
+        expect(target.searchParams.get('serial')).toBe(device.serialNumber);
       }
     });
 

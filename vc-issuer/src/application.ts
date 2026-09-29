@@ -180,6 +180,12 @@ export async function buildApplication(
     };
   });
 
+  app.post('/api/v1/operator/authorize', async request => {
+    authenticator.assertAuthorized(request.headers.authorization);
+    requireServices(services);
+    return {authorized: true};
+  });
+
   app.get(PRODUCT_CONTEXT_PATH, async (_request, reply) => {
     const contextPath = path.join(
       PROJECT_ROOT, 'contexts', 'product-v1.jsonld'

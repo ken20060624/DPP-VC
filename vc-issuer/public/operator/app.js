@@ -35,12 +35,47 @@
 
   const state = {
     originalCredential: null,
+    authorized: false,
     busy: false,
     toastTimer: null
   };
 
   const byId = id => document.getElementById(id);
   const allActionButtons = () => [...document.querySelectorAll('button')];
+
+  function goToStep(step) {
+    if(step === 2 && !state.authorized) {
+      showToast('請先在第 1 頁驗證 Operator API Key。', true);
+      return;
+    }
+    for(const page of document.querySelectorAll('.step-page')) {
+      page.hidden = Number(page.dataset.page) !== step;
+    }
+    for(const button of document.querySelectorAll('.workflow-step')) {
+      const active = Number(button.dataset.step) === step;
+      button.classList.toggle('is-active', active);
+      if(active) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  async function authorizeOperator() {
+    await runBusy(async () => {
+      await request('/api/v1/operator/authorize', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey()}`,
+          'Content-Type': 'application/json'
+        },
+        body: '{}'
+      });
+      state.authorized = true;
+      addActivity('Operator API Key 授權通過。');
+      showToast('授權通過，請填寫產品資料。');
+      goToStep(2);
+    });
+  }
 
   function setValue(id, value) {
     byId(id).value = value;
@@ -164,9 +199,8 @@
       state.originalCredential = structuredClone(result.credential);
       writeCredential(result.credential);
       addActivity(`已簽發 ${result.credential.id}`);
-      const verification = await verifyCredential();
-      showToast(verification.verified ? '憑證簽發成功，且公開驗證通過。' :
-        '憑證已簽發，但公開驗證未通過。', !verification.verified);
+      showToast('憑證已簽發；可在第 4 頁進行公開驗證。');
+      goToStep(3);
     });
   }
 
@@ -210,9 +244,7 @@
         `${credential.credentialSubject.productName}（已竄改）`;
       writeCredential(credential);
       addActivity('已修改簽章後的產品名稱，產生竄改副本。');
-      const result = await verifyCredential();
-      showToast(result.verified ? '警告：竄改副本竟然通過驗證。' :
-        '竄改已被數位簽章成功偵測。', result.verified);
+      showToast('已產生竄改副本；請到第 4 頁驗證。');
     });
   }
 
@@ -243,9 +275,7 @@
       });
       writeCredential(state.originalCredential);
       addActivity(result.alreadyRevoked ? '憑證先前已撤銷。' : '已撤銷原始憑證。');
-      const verification = await verifyCredential();
-      showToast(verification.verified ? '警告：已撤銷憑證仍通過驗證。' :
-        '撤銷完成，公開驗證已拒絕此憑證。', verification.verified);
+      showToast('撤銷狀態已寫入；請到第 4 頁重新驗證。');
     });
   }
 
@@ -288,6 +318,7 @@
 
   function writeCredential(credential) {
     byId('credentialJson').value = JSON.stringify(credential, null, 2);
+    resetVerification();
   }
 
   async function copyCredential() {
@@ -307,12 +338,16 @@
 
   function clearCredential() {
     byId('credentialJson').value = '';
+    resetVerification();
+    addActivity('已清除畫面中的 Credential JSON。');
+  }
+
+  function resetVerification() {
     byId('resultEmpty').hidden = false;
     byId('verificationResult').hidden = true;
     const badge = byId('verificationBadge');
     badge.className = 'verification-badge is-empty';
     badge.textContent = '尚未驗證';
-    addActivity('已清除畫面中的 Credential JSON。');
   }
 
   function addActivity(message) {
@@ -378,6 +413,15 @@
   }
 
   function bindEvents() {
+    byId('authorizeOperator').addEventListener('click', authorizeOperator);
+    byId('apiKey').addEventListener('input', () => {
+      state.authorized = false;
+    });
+    byId('credentialJson').addEventListener('input', resetVerification);
+    for(const button of document.querySelectorAll('[data-go-step], .workflow-step')) {
+      button.addEventListener('click', () =>
+        goToStep(Number(button.dataset.goStep || button.dataset.step)));
+    }
     byId('loadDemo').addEventListener('click', loadDemo);
     byId('refreshReady').addEventListener('click', checkReadiness);
     byId('issueCredential').addEventListener('click', issueCredential);
