@@ -1,0 +1,9 @@
+LaPO 商品 Mock Data 說明
+
+1. `lapo.java` 的內容是 JSON 商品資料，不是 Java source code。
+2. 商品資料（DPP）與 Verifiable Credential（VC）分開保存。
+3. `id` 是跨 GS1、DPP、VC、UI 共用的 canonical Product ID。
+4. `gtin` 必須是 14 位並通過 GS1 Mod-10 檢查碼。
+5. VC Issuer 會把此商品物件放入 `credentialSubject` 並簽署完整內容。
+6. 簽章成功只證明指定 Issuer 發出且內容未被修改，不代表 SGS 或法規背書。
+7. 正式展示前必須將 Demo GTIN 換成獲授權的真實 GTIN。
