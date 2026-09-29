@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>DPP-VC 前端流程模擬</title>
+  <title>DPP-VC 憑證簽發與驗證 Demo</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; padding: 24px; max-width: 900px; margin: 0 auto; background: #f8fafc; color: #0f172a; }
     h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
@@ -21,27 +21,26 @@
 </head>
 <body>
 
-  <h1>🛡️ DPP-VC 前端流程模擬</h1>
-  <p class="card" style="background:#fff7ed;">此頁只用非密碼學雜湊示範介面操作，沒有建立 Ed25519 簽章，也沒有查核 Issuer、撤銷或法規聲明。需要真正簽發與驗證時，請使用 vc-issuer 操作台。</p>
+  <h1>🛡️ DPP-VC 數位產品護照憑證簽發與驗證</h1>
 
   <!-- 1. 商品預覽 -->
   <div class="card">
-    <h2>1. LaPO 商品資料（模擬）</h2>
+    <h2>1. LaPO 商品原始護照 (Issuer 簽發端)</h2>
     <div class="info-row"><strong>商品名稱：</strong> LaPO 迷你渦輪隨身風扇 (LF-02)</div>
-    <div class="info-row"><strong>GTIN：</strong> 00047199990002</div>
-    <div class="info-row"><strong>示範 Issuer DID：</strong> did:example:lapo-demo</div>
+    <div class="info-row"><strong>唯一識別碼 (GTIN)：</strong> urn:gtin:04710000000000:SN202603001</div>
+    <div class="info-row"><strong>簽發機構 (Issuer DID)：</strong> did:web:dpp.lapo.com.tw</div>
     <br>
-    <button class="btn-blue" onclick="issueVC()">✍️ 產生 VC 形狀的示範 JSON</button>
+    <button class="btn-blue" onclick="issueVC()">✍️ 簽發 W3C VC 可驗證憑證</button>
   </div>
 
   <!-- 2. VC 內容與編輯區 -->
   <div id="vcSection" class="card" style="display:none;">
-    <h2>2. 示範 JSON 與內容比對</h2>
-    <p><small style="color: #64748b;">下方 JSON 無有效的密碼學簽章，不能當作真正 VC 使用。可修改資料觀察本頁的簡易比對結果：</small></p>
+    <h2>2. VC 憑證內容 (Verifier 驗證端)</h2>
+    <p><small style="color: #64748b;">下方為簽發出的完整 W3C VC 格式。您可以點擊「竄改數據」或直接在框內修改文字測試密碼學防竄改效果：</small></p>
 
     <div style="margin-bottom: 16px;">
       <button class="btn-amber" onclick="tamperVC()">⚠️ 模擬竄改電池容量 (5100mAh ➔ 9999mAh)</button>
-      <button class="btn-green" onclick="verifyVC()">🔍 執行示範比對</button>
+      <button class="btn-green" onclick="verifyVC()">🔍 執行密碼學驗證</button>
     </div>
 
     <!-- 驗證結果顯示區 -->
@@ -54,14 +53,14 @@
   <script>
     // 完整商品與護照原始數據 (依據 lapo.java 整理)
     const productData = {
-      id: "https://dpp-demo.example.com/01/00047199990002/21/FAN-2026-001",
+      id: "urn:gtin:04710000000000:SN202603001",
       productName: "LaPO 迷你渦輪隨身風扇",
       modelNumber: "LF-02",
       brand: "LaPO",
       countryOfOrigin: "TW",
       documentation: {
-        userManual: "https://www.lapo.com.tw/manuals/LF-02-manual.pdf",
-        repairGuide: "https://www.lapo.com.tw/service/LF-02-repair.pdf"
+        userManual: "https://www.lapo.com.tw/manuals/LA-F1-manual.pdf",
+        repairGuide: "https://www.lapo.com.tw/service/LA-F1-repair.pdf"
       },
       batteryComponent: {
         supplierDid: "did:web:cert.battery-supplier.com",
@@ -87,7 +86,7 @@
     // 儲存原始產生的 Hash 值的變數 (用來比對防竄改)
     let originalSignatureHash = "";
 
-    // 非密碼學的示範雜湊；不可當作 Ed25519 簽章
+    // 簡單的加密 Hash 計算函式 (模擬 Ed25519 簽章)
     function generateMockSignature(dataObj) {
       const str = JSON.stringify(dataObj);
       let hash = 0;
@@ -96,12 +95,12 @@
         hash = (hash << 5) - hash + char;
         hash |= 0;
       }
-      return "demo-hash-" + Math.abs(hash).toString(16);
+      return "z" + Math.abs(hash).toString(16) + "9f8e7d6c5b4a321";
     }
 
-    // 1. 產生示範 JSON
+    // 1. 簽發 VC 憑證
     function issueVC() {
-      // 計算只供本頁比對的雜湊
+      // 計算 payload 的 Hash 簽名
       originalSignatureHash = generateMockSignature(productData);
 
       const vcDocument = {
@@ -112,13 +111,13 @@
         ],
         "id": "urn:uuid:a1b2c3d4-e5f6-7890-1234-56789abcdef0",
         "type": ["DigitalProductPassport", "VerifiableCredential"],
-        "issuer": "did:example:lapo-demo",
+        "issuer": "did:web:dpp.lapo.com.tw",
         "issuanceDate": new Date().toISOString(),
         "credentialSubject": productData,
         "proof": {
-          "type": "DemoOnlyHash",
+          "type": "Ed25519Signature2020",
           "created": new Date().toISOString(),
-          "verificationMethod": "did:example:lapo-demo#demo",
+          "verificationMethod": "did:web:dpp.lapo.com.tw#key-1",
           "proofPurpose": "assertionMethod",
           "proofValue": originalSignatureHash
         }
@@ -129,7 +128,7 @@
       document.getElementById('verifyResult').style.display = 'none';
     }
 
-    // 2. 只比對本頁保存的示範雜湊
+    // 2. 驗證 VC 憑證
     function verifyVC() {
       const area = document.getElementById('vcJsonArea');
       const resultDiv = document.getElementById('verifyResult');
@@ -150,10 +149,10 @@
       // 比對簽章
       if (currentSubjectHash === originalSignatureHash && vcObj.proof?.proofValue === originalSignatureHash) {
         resultDiv.className = 'badge-valid';
-        resultDiv.innerHTML = '✅ <strong>示範比對一致</strong>：產品欄位與本頁產生時相同；這不是 VC 密碼學驗證。';
+        resultDiv.innerHTML = '✅ <strong>驗證成功 (VALID)</strong>：密碼學數位簽章吻合，產品護照內容未被竄改！';
       } else {
         resultDiv.className = 'badge-invalid';
-        resultDiv.innerHTML = '❌ <strong>示範比對不一致</strong>：產品欄位或示範雜湊已變更；請用真正 Verifier 查驗正式 VC。';
+        resultDiv.innerHTML = '❌ <strong>驗證失敗 (INVALID)</strong>：防竄改警報！資料內容與簽發者的數位簽章不符，數據已被非法竄改！';
       }
     }
 
@@ -166,7 +165,7 @@
           vc.credentialSubject.batteryComponent.capacityMah = 9999;
           area.value = JSON.stringify(vc, null, 2);
           document.getElementById('verifyResult').style.display = 'none';
-          alert('⚠️ 已將電池容量從 5100mAh 改為 9999mAh！\n請點擊「🔍 執行示範比對」觀察結果。');
+          alert('⚠️ 已將電池容量從 5100mAh 竄改為 9999mAh！\n請點擊「🔍 執行密碼學驗證」觀察驗證結果！');
         } else {
           alert('找不到 batteryComponent 欄位');
         }

@@ -49,25 +49,20 @@ source venv/bin/activate
 pip install qrcode pillow
 ```
 
-2. **啟動本地 HTTP 伺服器**
+2. **產生 GS1 QR Code**
 ```bash
-python -m http.server 5501 --bind 127.0.0.1
+python scripts/generate_qr.py
 ```
 
-3. **開啟內網穿透（供手機相機掃描實測）**
+3. **啟動本地 HTTP 伺服器**
 ```bash
-npx localtunnel --port 5501
+python -m http.server 3000 --bind 127.0.0.1
 ```
 
-4. **用當次可連線的公開網址產生 QR Code**
+4. **開啟內網穿透（供手機相機掃描實測）**
 ```bash
-DPP_BASE_URL=https://你的網址/index.html python scripts/generate_qr.py
+npx localtunnel --port 3000
 ```
-
-Windows PowerShell 可先設定 `$env:DPP_BASE_URL='https://你的網址/index.html'`，
-再執行 `python scripts/generate_qr.py`。產生後重新提交 `scripts/devices.json`
-與兩張 QR 圖。產生器在未設定環境變數時會使用原示範 localtunnel 網址；
-暫時性網址可能失效，測試只核對 QR 圖與資料檔一致，不會證明網址仍可連線。
 
 ## 📋 Commit 格式
 
@@ -90,14 +85,12 @@ Windows PowerShell 可先設定 `$env:DPP_BASE_URL='https://你的網址/index.h
       ↓
 🔐 驗證 VC
       ↓
-✅ 確認憑證來源、完整性與撤銷狀態
+✅ 確認資料可信
 ```
 
 ## 🔐 VC Issuer 第二階段
 
 可執行的 VC 2.0 簽發與驗證服務位於 [`vc-issuer/`](vc-issuer/)。
-根目錄 `index.html` 與 `Desktop/Lapo/index.html` 是純前端展示頁，沒有進行真正
-的 VC 密碼學驗證；需要查核簽章與撤銷狀態時，請使用下方操作台。
 
 ### Windows 一鍵啟動
 

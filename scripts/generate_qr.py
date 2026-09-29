@@ -1,21 +1,9 @@
 import json
 import os
-from urllib.parse import urlencode, urlparse
-
 import qrcode
 
-# 可在產生 QR 前指定目前的公開展示網址。
-BASE_URL = os.environ.get(
-    "DPP_BASE_URL", "https://thin-boxes-build.loca.lt/index.html"
-)
-parsed_base_url = urlparse(BASE_URL)
-if (
-    parsed_base_url.scheme != "https"
-    or not parsed_base_url.netloc
-    or parsed_base_url.query
-    or parsed_base_url.fragment
-):
-    raise ValueError("DPP_BASE_URL 必須是沒有 query/fragment 的 HTTPS 網址")
+# 設定穿透網址，直接帶上 index.html
+BASE_URL = "https://thin-boxes-build.loca.lt/index.html"
 
 devices_file = os.path.join(os.path.dirname(__file__), "devices.json")
 output_dir = os.path.join(os.path.dirname(__file__), "../public/qrcodes")
@@ -49,7 +37,7 @@ for fan in devices:
         raise ValueError(f"[{fan['id']}] GTIN 必須是通過檢查碼的 14 位數字")
     
     # 組合完整帶有參數的網址
-    gs1_url = f"{BASE_URL}?{urlencode({'gtin': gtin, 'serial': serial})}"
+    gs1_url = f"{BASE_URL}?gtin={gtin}&serial={serial}"
     fan["targetUrl"] = gs1_url
     
     # 產生 QR Code
