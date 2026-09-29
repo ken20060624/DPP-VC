@@ -21,6 +21,25 @@ afterEach(async () => {
 });
 
 describe('VC issuer HTTP flow', () => {
+  it('checks operator authorization without issuing a credential', async () => {
+    const {app} = await setup();
+    const missing = await app.inject({
+      method: 'POST', url: '/api/v1/operator/authorize'
+    });
+    expect(missing.statusCode).toBe(401);
+    const invalid = await app.inject({
+      method: 'POST', url: '/api/v1/operator/authorize',
+      headers: {authorization: 'Bearer wrong-key'}
+    });
+    expect(invalid.statusCode).toBe(401);
+    const valid = await app.inject({
+      method: 'POST', url: '/api/v1/operator/authorize',
+      headers: {authorization: TEST_AUTHORIZATION}
+    });
+    expect(valid.statusCode).toBe(200);
+    expect(valid.json()).toEqual({authorized: true});
+  });
+
   it('issues, verifies, stores, and retrieves a VC 2.0 credential', async () => {
     const {workspace, app} = await setup();
     const product = await loadFanFixture();
