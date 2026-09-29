@@ -54,6 +54,11 @@ pip install qrcode pillow
 python scripts/generate_qr.py
 ```
 
+`scripts/generate_qr.py` 預設使用目前示範用的 localtunnel 網址。若公開網址變更，
+先設定 `DPP_BASE_URL=https://你的網址/index.html` 再執行產生器，並重新提交
+`scripts/devices.json` 與兩張 QR 圖。測試會核對 QR 圖與資料檔一致，但不會
+證明暫時性穿透網址仍可連線。
+
 3. **啟動本地 HTTP 伺服器**
 ```bash
 python -m http.server 3000 --bind 127.0.0.1
@@ -85,12 +90,14 @@ npx localtunnel --port 3000
       ↓
 🔐 驗證 VC
       ↓
-✅ 確認資料可信
+✅ 確認憑證來源、完整性與撤銷狀態
 ```
 
 ## 🔐 VC Issuer 第二階段
 
 可執行的 VC 2.0 簽發與驗證服務位於 [`vc-issuer/`](vc-issuer/)。
+根目錄 `index.html` 與 `Desktop/Lapo/index.html` 是純前端展示頁，沒有進行真正
+的 VC 密碼學驗證；需要查核簽章與撤銷狀態時，請使用下方操作台。
 
 ### Windows 一鍵啟動
 
