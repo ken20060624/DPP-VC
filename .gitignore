@@ -14,3 +14,4 @@ vc-issuer/data/status/**/*.tmp
 !vc-issuer/data/status/assignments/.gitkeep
 !vc-issuer/data/status/revocations/.gitkeep
 vc-issuer/coverage/
+*.png
