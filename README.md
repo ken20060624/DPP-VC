@@ -49,25 +49,25 @@ source venv/bin/activate
 pip install qrcode pillow
 ```
 
-2. **產生 GS1 QR Code**
+2. **啟動本地 HTTP 伺服器**
 ```bash
-python scripts/generate_qr.py
+python -m http.server 5501 --bind 127.0.0.1
 ```
 
-`scripts/generate_qr.py` 預設使用目前示範用的 localtunnel 網址。若公開網址變更，
-先設定 `DPP_BASE_URL=https://你的網址/index.html` 再執行產生器，並重新提交
-`scripts/devices.json` 與兩張 QR 圖。測試會核對 QR 圖與資料檔一致，但不會
-證明暫時性穿透網址仍可連線。
-
-3. **啟動本地 HTTP 伺服器**
+3. **開啟內網穿透（供手機相機掃描實測）**
 ```bash
-python -m http.server 3000 --bind 127.0.0.1
+npx localtunnel --port 5501
 ```
 
-4. **開啟內網穿透（供手機相機掃描實測）**
+4. **用當次可連線的公開網址產生 QR Code**
 ```bash
-npx localtunnel --port 3000
+DPP_BASE_URL=https://你的網址/index.html python scripts/generate_qr.py
 ```
+
+Windows PowerShell 可先設定 `$env:DPP_BASE_URL='https://你的網址/index.html'`，
+再執行 `python scripts/generate_qr.py`。產生後重新提交 `scripts/devices.json`
+與兩張 QR 圖。產生器在未設定環境變數時會使用原示範 localtunnel 網址；
+暫時性網址可能失效，測試只核對 QR 圖與資料檔一致，不會證明網址仍可連線。
 
 ## 📋 Commit 格式
 
