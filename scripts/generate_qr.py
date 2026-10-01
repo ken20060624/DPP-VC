@@ -3,7 +3,7 @@ import os
 import qrcode
 
 # 設定穿透網址，直接帶上 index.html
-BASE_URL = "https://thin-boxes-build.loca.lt/index.html"
+BASE_URL = "https://ken20060624.github.io/DPP-VC/"
 
 devices_file = os.path.join(os.path.dirname(__file__), "devices.json")
 output_dir = os.path.join(os.path.dirname(__file__), "../public/qrcodes")

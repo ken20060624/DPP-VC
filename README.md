@@ -1,138 +1,28 @@
-# 🍃 DPP-VC 手持電風扇數位產品護照
+# DPP-VC (數位產品護照與可驗證憑證驗證系統)
 
-結合 **DPP（Digital Product Passport）** 與 **W3C VC（Verifiable Credentials）**，為手持電風扇建立數位產品履歷，提供產品資訊、溯源與資料驗證。
+基於歐盟電池法規 (ESPR) 趨勢，結合 GS1 數位連結 (Digital Link) 與 W3C 可驗證憑證 (Verifiable Credentials, VC) 建構之實體產品防偽與資安防竄改驗證系統。
 
-## 📌 專案功能
-
-- 🔗 QR Code 綁定實體產品
-- 📦 GS1 Digital Link 產品識別與路由解析
-- 🌱 DPP 產品資料管理
-- 🔐 W3C DID / VC 資料簽發與密碼學驗證
-- 🔋 電池合規、碳足跡等環保資訊展示
-- 📱 Mobile-first DPP 移動端展示頁面
+## 🔗 系統入口
+- **消費者前端介面：** [https://ken20060624.github.io/DPP-VC/](https://ken20060624.github.io/DPP-VC/)
+- **後台管理儀表板：** [https://ken20060624.github.io/DPP-VC/Desktop/Lapo/index.html](https://ken20060624.github.io/DPP-VC/Desktop/Lapo/index.html)
+- **實體綁定標籤：** 掃描測試請使用 `public/qrcodes/` 目錄下之 GS1 標準 QR Code 圖片。
 
 ## 🏗️ 系統架構
+本專案採用前後端分離架構，分為三大模組：
+1. **實體錨定層 ：** 動態生成帶有 GTIN 與專屬序號 (Serial) 的永久性 QR Code 圖片。
+2. **展示、互動層：** 部署於 GitHub Pages，負責讀取條碼參數並向後端發起密碼學驗證請求。
+3. **密碼驗證層：** 封裝於 Docker 容器，負責 Ed25519 數位簽章運算與狀態比對。
 
-```text
-實體風扇
-   ↓
-QR Code / GS1 Digital Link
-   ↓
-DPP 產品資料
-   ↓
-W3C DID / VC
-   ↓
-Web UI
-   ↓
-消費者 / 監管人員
-```
+## 🚀 報告展示操作手冊 (Demo 步驟)
 
-## 🌿 Git 分支
+為了完整展現「資料竄改即時攔截」功能，請依循以下步驟啟動系統：
 
-| 分支 | 負責內容 |
-| :--- | :--- |
-| `feature/gs1` | QR Code 批次產出、GS1 Digital Link 路由 |
-| `feature/dpp` | DPP 資料模型、產品規格資料 |
-| `feature/vc` | DID、VC 簽發與驗證邏輯 |
-| `feature/ui` | 前端介面、展示卡片與驗證狀態反饋 |
-| `dev` | 功能整合與測試 |
-| `main` | 最終展示版本 |
-
-> ⚠️ **禁止直接 Push 到 `dev` 或 `main`。**  
-> 所有功能請在各自分支開發完成後，透過 Pull Request 合併。
-
-## 🛠️ 本地開發與展示步驟
-
-1. **啟動虛擬環境並安裝相依套件**
-```bash
-source venv/bin/activate
-pip install qrcode pillow
-```
-
-2. **產生 GS1 QR Code**
-```bash
-python scripts/generate_qr.py
-```
-
-3. **啟動本地 HTTP 伺服器**
-```bash
-python -m http.server 3000 --bind 127.0.0.1
-```
-
-4. **開啟內網穿透（供手機相機掃描實測）**
-```bash
-npx localtunnel --port 3000
-```
-
-## 📋 Commit 格式
-
-- `feat:` 新增功能
-- `fix:` 修正問題
-- `docs:` 修改文件
-- `refactor:` 重構程式
-- `test:` 新增測試
-
-## 🎯 專案目標
-
-完成：
-
-```text
-📱 掃描 QR Code
-      ↓
-🔗 找到產品
-      ↓
-📦 查看 DPP
-      ↓
-🔐 驗證 VC
-      ↓
-✅ 確認資料可信
-```
-
-## 🔐 VC Issuer 第二階段
-
-可執行的 VC 2.0 簽發與驗證服務位於 [`vc-issuer/`](vc-issuer/)。
-
-### Windows 一鍵啟動
-
-直接雙擊專案根目錄的 [`啟動-VC操作台.bat`](啟動-VC操作台.bat)。第一次啟動會
-自動安裝套件、建立本機 Issuer 金鑰與 Operator API Key，之後會啟動服務並開啟
-`http://127.0.0.1:3000/operator/`。
-
-啟動器會把 Operator API Key 複製到剪貼簿；在操作台的 API Key 欄位按
-`Ctrl+V` 即可。Key 只保存在被 Git 忽略的
-`vc-issuer/secrets/operator-api-key.txt`，不會寫入網頁或版本庫。
-
-### macOS / Docker 啟動
-
-安裝並啟動 Docker Desktop，在專案根目錄執行：
-
-```sh
-docker compose up --build -d
-docker compose ps
-docker compose exec -T issuer cat /app/secrets/operator-api-key.txt
-```
-
-開啟 `http://127.0.0.1:3000/operator/`，將第三個指令顯示的 Key 貼到第 1 頁，
-按「驗證授權並前往產品資料」。用 `docker compose down` 停止。Docker 使用自己的
-`issuer_secrets`、`issuer_data` 命名儲存卷，重啟後會保留金鑰、VC 與撤銷紀錄；
-不要使用 `docker compose down -v`，除非確定要刪除它們。Docker 與 `.bat` 的
-本機資料相互獨立。詳細說明見 [`vc-issuer/README.md`](vc-issuer/README.md)。
-
-```bash
-cd vc-issuer
-npm ci
-npm run generate-key
-npm run generate-api-key
-npm test
-npm run dev
-```
-
-目前服務已加入簽發／撤銷授權、W3C Bitstring Status List v1.0、`did:web`
-provider 與公開 DID/context 路由。它能驗證 Issuer 來源、credential 完整性與
-撤銷狀態，但仍不代表商品已通過 SGS 或法規合規審查。完整操作與安全邊界請見
-[`vc-issuer/README.md`](vc-issuer/README.md)。
-
-執行計畫：
-
-- [`VC-Issuer-第一階段實作計畫-v2.md`](VC-Issuer-第一階段實作計畫-v2.md)
-- [`VC-Issuer-第二階段實作計畫.md`](VC-Issuer-第二階段實作計畫.md)
+1. **啟動後端驗證引擎：**
+   - 於本機執行 `啟動-VC操作台.bat`，確保 Docker 容器於 Port 3000 運行。
+2. **開啟對外通道 (Ngrok)：**
+   - 於終端機執行 `ngrok http 3000` 取得對外暫時網址。
+   - 將前端網頁程式碼中 `fetch()` 的驗證端點，暫時替換為該 ngrok 網址。
+3. **情境展示：**
+   - **正品驗證：** 掃描 `FAN-001` QR Code，前端綠燈顯示 VC 驗證通過。
+   - **防竄改攔截：** 於 Lapo 後台點擊「模擬竄改電池容量」，重新整理手機前端頁面，系統比對簽章失效，即時觸發紅燈警報。
+   - **防偽造攔截：** 掃描未授權之 `FAN-002` QR Code，系統拒絕驗證並顯示無效。
