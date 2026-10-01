@@ -7,40 +7,70 @@
     body { font-family: system-ui, -apple-system, sans-serif; padding: 24px; max-width: 900px; margin: 0 auto; background: #f8fafc; color: #0f172a; }
     h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
     .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+    .product-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: center; }
+    .qr-box { text-align: center; background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px dashed #cbd5e1; }
+    .qr-box img { max-width: 140px; height: auto; border-radius: 4px; }
     button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
     button:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-blue { background: #2563eb; color: white; }
     .btn-amber { background: #d97706; color: white; margin-right: 8px; }
     .btn-green { background: #16a34a; color: white; }
-    .badge-valid { background: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .badge-invalid { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    textarea { width: 100%; height: 380px; background: #0f172a; color: #38bdf8; font-family: 'Fira Code', monospace; padding: 14px; border-radius: 8px; box-sizing: border-box; font-size: 13px; line-height: 1.5; border: 1px solid #334155; }
+    .btn-slate { background: #475569; color: white; text-decoration: none; display: inline-flex; align-items: center; margin-top: 8px; }
+    .badge-valid { background: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 16px; }
+    .badge-invalid { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 16px; }
+    textarea { width: 100%; height: 360px; background: #0f172a; color: #38bdf8; font-family: 'Fira Code', monospace; padding: 14px; border-radius: 8px; box-sizing: border-box; font-size: 13px; line-height: 1.5; border: 1px solid #334155; }
     .info-row { margin: 8px 0; color: #475569; }
     .info-row strong { color: #1e293b; }
+    .tech-tag { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+    .btn-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
   </style>
 </head>
 <body>
 
   <h1>🛡️ DPP-VC 數位產品護照憑證簽發與驗證</h1>
 
-  <!-- 1. 商品預覽 -->
+  <!-- 1. 商品預覽 (包含 QR Code 區塊與 PDF 按鈕) -->
   <div class="card">
-    <h2>1. LaPO 商品原始護照 (Issuer 簽發端)</h2>
-    <div class="info-row"><strong>商品名稱：</strong> LaPO 迷你渦輪隨身風扇 (LF-02)</div>
-    <div class="info-row"><strong>唯一識別碼 (GTIN)：</strong> urn:gtin:04710000000000:SN202603001</div>
-    <div class="info-row"><strong>簽發機構 (Issuer DID)：</strong> did:web:dpp.lapo.com.tw</div>
-    <br>
-    <button class="btn-blue" onclick="issueVC()">✍️ 簽發 W3C VC 可驗證憑證</button>
+    <div class="product-grid">
+      <div>
+        <h2>1. LaPO 商品原始護照 (Issuer 簽發端)</h2>
+        <div class="info-row"><strong>商品名稱：</strong> LaPO 迷你渦輪隨身風扇 (LF-02)</div>
+        <div class="info-row"><strong>唯一識別碼 (GTIN)：</strong> urn:gtin:04710000000000:SN202603001</div>
+        <div class="info-row"><strong>簽發機構 (Issuer DID)：</strong> did:web:dpp.lapo.com.tw</div>
+        <div class="info-row" style="margin-top: 10px;">
+          <span class="tech-tag">W3C VC v2.0</span>
+          <span class="tech-tag">GS1 Digital Link</span>
+          <span class="tech-tag">Ed25519 防竄改</span>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn-blue" onclick="issueVC()">✍️ 簽發 VC (POST /issue)</button>
+          <a href="public/manuals/LF-02-manual.pdf" target="_blank" style="text-decoration: none;">
+            <button type="button" class="btn-slate">📄 查看官方產品說明書 (PDF)</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- 讀取實體 QR Code 圖片 -->
+      <div class="qr-box">
+        <!-- 嘗試讀取本地檔案，如果失敗自動切換為線上生成，確保 100% 顯示 -->
+        <img id="qrImage" 
+             src="./public/qrcodes/FAN-001_FAN%202026-001.png" 
+             alt="GS1 QR Code" 
+             onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://dpp.lapo.com.tw/01/04710000000000/21/SN202603001';">
+        <div style="font-size: 12px; color: #64748b; margin-top: 6px;">掃瞄實體護照 QR Code</div>
+      </div>
+    </div>
   </div>
 
   <!-- 2. VC 內容與編輯區 -->
   <div id="vcSection" class="card" style="display:none;">
-    <h2>2. VC 憑證內容 (Verifier 驗證端)</h2>
-    <p><small style="color: #64748b;">下方為簽發出的完整 W3C VC 格式。您可以點擊「竄改數據」或直接在框內修改文字測試密碼學防竄改效果：</small></p>
+    <h2>2. VC 憑證 JSON (可自由編輯)</h2>
+    <p><small style="color: #64748b;">下方為簽發出的完整 W3C VC 格式。您可以點擊「竄改數據」測試密碼學防竄改效果：</small></p>
 
     <div style="margin-bottom: 16px;">
       <button class="btn-amber" onclick="tamperVC()">⚠️ 模擬竄改電池容量 (5100mAh ➔ 9999mAh)</button>
-      <button class="btn-green" onclick="verifyVC()">🔍 執行密碼學驗證</button>
+      <button class="btn-green" onclick="verifyVC()">🔍 驗證憑證 (POST /verify)</button>
     </div>
 
     <!-- 驗證結果顯示區 -->
@@ -51,7 +81,9 @@
   </div>
 
   <script>
-    // 完整商品與護照原始數據 (依據 lapo.java 整理)
+    const API_BASE_URL = 'http://localhost:3000';
+
+    // 原始商品資料
     const productData = {
       id: "urn:gtin:04710000000000:SN202603001",
       productName: "LaPO 迷你渦輪隨身風扇",
@@ -59,8 +91,8 @@
       brand: "LaPO",
       countryOfOrigin: "TW",
       documentation: {
-        userManual: "https://www.lapo.com.tw/manuals/LA-F1-manual.pdf",
-        repairGuide: "https://www.lapo.com.tw/service/LA-F1-repair.pdf"
+        userManual: "./public/manuals/LF-02-manual.pdf",
+        officialProductPage: "https://www.lapo.com.tw/zh-TW/products/vortexfan"
       },
       batteryComponent: {
         supplierDid: "did:web:cert.battery-supplier.com",
@@ -83,76 +115,55 @@
       }
     };
 
-    // 儲存原始產生的 Hash 值的變數 (用來比對防竄改)
-    let originalSignatureHash = "";
-
-    // 簡單的加密 Hash 計算函式 (模擬 Ed25519 簽章)
-    function generateMockSignature(dataObj) {
-      const str = JSON.stringify(dataObj);
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash |= 0;
+    // 1. 呼叫後端 API 簽發 VC
+    async function issueVC() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/credentials/issue`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: productData })
+        });
+        const vc = await res.json();
+        
+        document.getElementById('vcJsonArea').value = JSON.stringify(vc, null, 2);
+        document.getElementById('vcSection').style.display = 'block';
+        document.getElementById('verifyResult').style.display = 'none';
+      } catch (err) {
+        alert('❌ 發證失敗，請確認 VC Issuer 後端 (localhost:3000) 已啟動！');
       }
-      return "z" + Math.abs(hash).toString(16) + "9f8e7d6c5b4a321";
     }
 
-    // 1. 簽發 VC 憑證
-    function issueVC() {
-      // 計算 payload 的 Hash 簽名
-      originalSignatureHash = generateMockSignature(productData);
-
-      const vcDocument = {
-        "@context": [
-          "https://www.w3.org/2018/credentials/v1",
-          "https://schema.org",
-          "https://dpp.eu/schemas/v1/portable-fan.jsonld"
-        ],
-        "id": "urn:uuid:a1b2c3d4-e5f6-7890-1234-56789abcdef0",
-        "type": ["DigitalProductPassport", "VerifiableCredential"],
-        "issuer": "did:web:dpp.lapo.com.tw",
-        "issuanceDate": new Date().toISOString(),
-        "credentialSubject": productData,
-        "proof": {
-          "type": "Ed25519Signature2020",
-          "created": new Date().toISOString(),
-          "verificationMethod": "did:web:dpp.lapo.com.tw#key-1",
-          "proofPurpose": "assertionMethod",
-          "proofValue": originalSignatureHash
-        }
-      };
-
-      document.getElementById('vcJsonArea').value = JSON.stringify(vcDocument, null, 2);
-      document.getElementById('vcSection').style.display = 'block';
-      document.getElementById('verifyResult').style.display = 'none';
-    }
-
-    // 2. 驗證 VC 憑證
-    function verifyVC() {
+    // 2. 呼叫後端 API 驗證 VC
+    async function verifyVC() {
       const area = document.getElementById('vcJsonArea');
       const resultDiv = document.getElementById('verifyResult');
       
-      let vcObj;
+      let credentialObj;
       try {
-        vcObj = JSON.parse(area.value);
+        credentialObj = JSON.parse(area.value);
       } catch (e) {
         alert('❌ JSON 格式不正確，請確認語法！');
         return;
       }
 
-      resultDiv.style.display = 'block';
-
-      // 重新計算當前 credentialSubject 的 Hash
-      const currentSubjectHash = generateMockSignature(vcObj.credentialSubject);
-
-      // 比對簽章
-      if (currentSubjectHash === originalSignatureHash && vcObj.proof?.proofValue === originalSignatureHash) {
-        resultDiv.className = 'badge-valid';
-        resultDiv.innerHTML = '✅ <strong>驗證成功 (VALID)</strong>：密碼學數位簽章吻合，產品護照內容未被竄改！';
-      } else {
-        resultDiv.className = 'badge-invalid';
-        resultDiv.innerHTML = '❌ <strong>驗證失敗 (INVALID)</strong>：防竄改警報！資料內容與簽發者的數位簽章不符，數據已被非法竄改！';
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/credentials/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: credentialObj })
+        });
+        const result = await res.json();
+        
+        resultDiv.style.display = 'block';
+        if (result.valid) {
+          resultDiv.className = 'badge-valid';
+          resultDiv.innerHTML = '✅ <strong>驗證成功 (VALID)</strong>：憑證完整且簽名有效，內容未被竄改！';
+        } else {
+          resultDiv.className = 'badge-invalid';
+          resultDiv.innerHTML = '❌ <strong>驗證失敗 (INVALID)</strong>：憑證簽名不符，內容已被非法竄改！';
+        }
+      } catch (err) {
+        alert('❌ 驗證 API 呼叫失敗，請確認後端連線！');
       }
     }
 
@@ -165,12 +176,12 @@
           vc.credentialSubject.batteryComponent.capacityMah = 9999;
           area.value = JSON.stringify(vc, null, 2);
           document.getElementById('verifyResult').style.display = 'none';
-          alert('⚠️ 已將電池容量從 5100mAh 竄改為 9999mAh！\n請點擊「🔍 執行密碼學驗證」觀察驗證結果！');
+          alert('⚠️️ 已將電池容量從 5100mAh 竄改為 9999mAh！\n請點擊「🔍 驗證憑證 (POST /verify)」觀察驗證結果！');
         } else {
           alert('找不到 batteryComponent 欄位');
         }
       } catch (e) {
-        alert('JSON 格式無效，無法竄改');
+        alert('無效的 JSON，無法竄改');
       }
     }
   </script>
