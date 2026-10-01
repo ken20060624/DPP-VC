@@ -30,7 +30,7 @@
           <p class="eyebrow">VERIFIABLE CREDENTIAL WORKBENCH</p>
           <h1>從產品資料到<br><span>可驗證憑證</span></h1>
           <p class="hero-copy">
-            用一個畫面完成簽發、驗證、竄改測試與撤銷，展示資料如何被真實的
+            依序完成授權、填寫產品護照、操作憑證與公開驗證，展示資料如何被真實的
             Ed25519 數位簽章保護。
           </p>
         </div>
@@ -50,18 +50,19 @@
         </div>
       </section>
 
-      <section class="workflow" aria-label="操作流程">
-        <div class="workflow-step is-active"><span>01</span><p>連線與授權</p></div>
+      <nav class="workflow" aria-label="操作流程">
+        <button class="workflow-step is-active" type="button" data-step="1" aria-label="第 1 步：驗證與授權" aria-current="step"><span>01</span><strong>驗證與授權</strong></button>
         <div class="workflow-line"></div>
-        <div class="workflow-step"><span>02</span><p>產品資料</p></div>
+        <button class="workflow-step" type="button" data-step="2" aria-label="第 2 步：產品資料"><span>02</span><strong>產品資料</strong></button>
         <div class="workflow-line"></div>
-        <div class="workflow-step"><span>03</span><p>簽發 VC</p></div>
+        <button class="workflow-step" type="button" data-step="3" aria-label="第 3 步：憑證操作"><span>03</span><strong>憑證操作</strong></button>
         <div class="workflow-line"></div>
-        <div class="workflow-step"><span>04</span><p>驗證結果</p></div>
-      </section>
+        <button class="workflow-step" type="button" data-step="4" aria-label="第 4 步：公開驗證"><span>04</span><strong>公開驗證</strong></button>
+      </nav>
 
-      <div class="dashboard-grid">
-        <div class="input-column">
+      <div class="step-layout">
+        <div class="step-pages">
+          <div class="step-page" data-page="1">
           <section class="panel connection-panel">
             <div class="panel-heading">
               <div>
@@ -83,13 +84,22 @@
               <span>Operator API Key</span>
               <div class="secret-field">
                 <input id="apiKey" type="password" autocomplete="off"
-                  placeholder="只在簽發與撤銷時使用">
+                  placeholder="貼上操作員授權金鑰">
                 <button id="toggleApiKey" type="button" aria-label="顯示或隱藏 API Key">顯示</button>
               </div>
-              <small>金鑰只保留在目前頁面，不會寫入瀏覽器儲存空間。</small>
+              <small>金鑰只保留在目前頁面記憶體，不會寫入瀏覽器儲存空間。</small>
             </label>
+            <div class="key-guide">
+              <h3>Operator API Key 是什麼？</h3>
+              <p>這是操作員的存取密鑰，和 Issuer 用來簽章 VC 的 Ed25519 私鑰不同。服務只保存它的 SHA-256 摘要；按「驗證授權」時會將 Key 當作 Bearer token 送至本機服務核對。</p>
+              <p>簽發與撤銷會再次檢查 Key；公開驗證 VC 不需要 Key，可直接前往第 3 頁貼上 JSON，再到第 4 頁驗證。Windows 啟動器會將 Key 複製到剪貼簿；Docker 使用者可依 README 的 <code>docker compose exec</code> 指令讀取。請勿把 Key 貼到聊天、截圖或提交到 Git。</p>
+              <p>重新整理頁面要再輸入。若 Key 外洩，需更換 Key 與服務端摘要；這不會更換 Issuer 簽章私鑰，也不會自動撤銷已簽憑證。</p>
+            </div>
+            <div class="step-actions"><button id="authorizeOperator" class="primary-button" type="button">驗證授權並前往產品資料 →</button></div>
           </section>
+          </div>
 
+          <div class="step-page" data-page="2" hidden>
           <section class="panel">
             <div class="panel-heading">
               <div>
@@ -159,44 +169,24 @@
                 </label>
               </div>
               <div class="compliance-row">
-                <label><input id="rohsCompliant" type="checkbox"> RoHS compliant</label>
-                <label><input id="reachCompliant" type="checkbox"> REACH compliant</label>
+                <label><input id="rohsCompliant" type="checkbox"> RoHS compliant（符合有害物質限用規範）</label>
+                <label><input id="reachCompliant" type="checkbox"> REACH compliant（符合歐盟化學品法規）</label>
               </div>
             </form>
 
             <div class="primary-actions">
               <button id="issueCredential" class="primary-button" type="button">
-                <span>簽發並立即驗證</span><span aria-hidden="true">→</span>
+                <span>簽發 VC 並前往憑證操作</span><span aria-hidden="true">→</span>
               </button>
             </div>
+            <div class="step-actions"><button type="button" data-go-step="1">← 返回驗證與授權</button><button type="button" data-go-step="3">前往憑證操作 →</button></div>
           </section>
-        </div>
+          </div>
 
-        <div class="result-column">
+          <div class="step-page" data-page="3" hidden>
           <section class="panel result-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="section-number">03 / VERIFICATION</p>
-                <h2>憑證與驗證結果</h2>
-              </div>
-              <span id="verificationBadge" class="verification-badge is-empty">尚未驗證</span>
-            </div>
-
-            <div id="resultEmpty" class="empty-state">
-              <div class="empty-symbol" aria-hidden="true">◇</div>
-              <h3>等待簽發憑證</h3>
-              <p>載入 Demo 資料並按下「簽發並立即驗證」，結果會顯示在這裡。</p>
-            </div>
-
-            <div id="verificationResult" class="verification-result" hidden>
-              <div class="credential-meta">
-                <div><span>Credential ID</span><strong id="credentialId">—</strong></div>
-                <div><span>Subject</span><strong id="subjectId">—</strong></div>
-              </div>
-              <div id="checksGrid" class="checks-grid"></div>
-              <div id="errorList" class="error-list" hidden></div>
-            </div>
-
+            <div class="panel-heading"><div><p class="section-number">03 / CREDENTIAL ACTIONS</p><h2>憑證操作</h2></div></div>
+            <p class="panel-note">可貼上既有 VC 進行驗證。竄改只修改下方 JSON 副本；還原會取回本次頁面簽發的原始 VC。撤銷會寫入服務端撤銷狀態，無法靠還原 JSON 取消。</p>
             <div class="credential-editor">
               <div class="editor-toolbar">
                 <span>Credential JSON</span>
@@ -210,12 +200,43 @@
             </div>
 
             <div class="secondary-actions">
-              <button id="verifyCredential" type="button">驗證目前 JSON</button>
               <button id="tamperCredential" class="warning-button" type="button">製造竄改副本</button>
               <button id="restoreCredential" type="button">還原原始 VC</button>
               <button id="revokeCredential" class="danger-button" type="button">撤銷原始 VC</button>
             </div>
+            <div class="step-actions"><button type="button" data-go-step="2">← 返回產品資料</button><button type="button" data-go-step="4">前往公開驗證 →</button></div>
           </section>
+          </div>
+          <div class="step-page" data-page="4" hidden>
+          <section class="panel result-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-number">04 / VERIFICATION</p>
+                <h2>公開驗證結果</h2>
+              </div>
+              <span id="verificationBadge" class="verification-badge is-empty">尚未驗證</span>
+            </div>
+
+            <div id="resultEmpty" class="empty-state">
+              <div class="empty-symbol" aria-hidden="true">◇</div>
+              <h3>等待簽發憑證</h3>
+              <p>在第 3 頁貼上或操作 Credential JSON，再按下驗證，結果會顯示在這裡。</p>
+            </div>
+
+            <div id="verificationResult" class="verification-result" hidden>
+              <div class="credential-meta">
+                <div><span>Credential ID</span><strong id="credentialId">—</strong></div>
+                <div><span>Subject</span><strong id="subjectId">—</strong></div>
+              </div>
+              <div id="checksGrid" class="checks-grid"></div>
+              <div id="errorList" class="error-list" hidden></div>
+            </div>
+
+            <div class="step-actions"><button id="verifyCredential" class="primary-button" type="button">驗證目前 JSON</button><button type="button" data-go-step="3">← 返回憑證操作</button></div>
+          </section>
+          </div>
+
+        </div>
 
           <section class="panel activity-panel">
             <div class="panel-heading compact-heading">
@@ -229,7 +250,6 @@
               <li class="muted-log">尚無操作紀錄</li>
             </ol>
           </section>
-        </div>
       </div>
     </main>
 

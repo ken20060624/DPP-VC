@@ -118,13 +118,21 @@ Invoke-RestMethod http://127.0.0.1:3000/ready
 
 ### 操作網頁
 
-服務啟動後開啟 `http://127.0.0.1:3000/operator/`，可在同一頁面完成：
+服務啟動後開啟 `http://127.0.0.1:3000/operator/`。操作台分為四個可往返的介面：
 
-- 載入示範產品資料；
-- 使用 Operator API Key 簽發 VC；
-- 驗證簽章、Issuer 與撤銷狀態；
-- 產生竄改副本並觀察驗證失敗；
-- 撤銷原始 VC 後再次驗證。
+1. 驗證與授權：填寫 Operator API Key 並由伺服器驗證。
+2. 產品護照資料：填寫或載入 Demo，簽發 VC。
+3. 憑證操作：查看或貼上 JSON、製造竄改副本、還原、撤銷。
+4. 公開驗證：檢查簽章、Issuer 與撤銷狀態。
+
+每個介面都有操作紀錄。已填表單與 JSON 在同一瀏覽器頁面中往返時保留。
+RoHS、REACH 的中文說明只解釋勾選項；勾選代表輸入者的聲明，不等於獨立合規審查。
+
+Operator API Key 是操作員授權密鑰，與簽署 VC 的 Issuer Ed25519 私鑰分開。
+服務端保存 SHA-256 摘要，使用者輸入的 Key 透過 Bearer Authorization header
+送到 `/api/v1/operator/authorize` 核對。簽發與撤銷仍各自要求有效 Key；公開驗證
+不需要 Key。請勿將 Key 放進 Git、截圖或聊天。若外洩，需更換 Key 與服務端摘要；
+已簽 VC 不會因此自動撤銷。
 
 網頁不會把 Operator API Key 寫入 `localStorage` 或 `sessionStorage`，重新載入
 頁面後需重新輸入。
@@ -132,6 +140,31 @@ Invoke-RestMethod http://127.0.0.1:3000/ready
 Windows 使用者也可以直接雙擊專案根目錄的 `啟動-VC操作台.bat`。第一次執行會
 自動準備本機開發環境；之後每次啟動會將保存在 `secrets/operator-api-key.txt`
 的本機 Key 複製到剪貼簿，並在服務就緒後開啟操作台。
+
+### Docker Desktop（macOS、Windows、Linux）
+
+在專案根目錄執行：
+
+```sh
+docker compose up --build -d
+docker compose ps
+docker compose exec -T issuer cat /app/secrets/operator-api-key.txt
+```
+
+Docker 首次啟動會建立 Issuer 私鑰與 Operator API Key，第三個指令只在你的終端機
+顯示 Key，請貼到 `http://127.0.0.1:3000/operator/` 的第 1 頁。確認服務：
+
+```sh
+curl http://127.0.0.1:3000/ready
+docker compose logs issuer
+```
+
+停止用 `docker compose down`。`issuer_secrets` 和 `issuer_data` 命名儲存卷保留
+Issuer 身分、操作 Key、已簽憑證與撤銷狀態；`down -v` 會刪掉它們，請勿用於
+一般停止。Docker 儲存卷與 Windows `.bat` 的本機檔案互不共用，兩邊是不同
+Issuer；也不能用其中一邊的 Key 授權另一邊。此 Compose 設定僅綁定本機
+`127.0.0.1:3000`，採開發用 `did:key` 與 HTTP；對外部署需另設 HTTPS、
+`did:web`、存取控制及備份。若 3000 埠已被 `.bat` 服務占用，先停止其中一個。
 
 ## 完整 Demo
 

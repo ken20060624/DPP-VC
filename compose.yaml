@@ -1,0 +1,28 @@
+services:
+  issuer:
+    build:
+      context: ./vc-issuer
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      PUBLIC_BASE_URL: http://127.0.0.1:3000
+      ISSUER_DID_METHOD: key
+      ISSUER_PRIVATE_KEY_PATH: ./secrets/issuer-key.json
+      CREDENTIAL_STORE_ENABLED: "true"
+      CREDENTIAL_STORE_PATH: ./data/credentials
+      STATUS_LIST_STORE_PATH: ./data/status
+      CORS_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
+    volumes:
+      - issuer_secrets:/app/secrets
+      - issuer_data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+volumes:
+  issuer_secrets:
+  issuer_data:

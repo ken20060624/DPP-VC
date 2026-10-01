@@ -142,12 +142,12 @@ button:disabled {
 }
 
 .hero {
-  min-height: 310px;
+  min-height: 250px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
   align-items: center;
   gap: 70px;
-  padding: 48px 20px 44px;
+  padding: 32px 20px;
 }
 
 .eyebrow,
@@ -267,7 +267,13 @@ button:disabled {
   align-items: center;
   gap: 9px;
   color: #98a49f;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
+
+.workflow-step:hover,
+.workflow-step:focus-visible { color: var(--green); }
 
 .workflow-step span {
   width: 30px;
@@ -281,7 +287,7 @@ button:disabled {
   font-weight: 800;
 }
 
-.workflow-step p {
+.workflow-step strong {
   margin: 0;
   font-size: 12px;
   font-weight: 700;
@@ -304,12 +310,53 @@ button:disabled {
   background: #ccd5d1;
 }
 
-.dashboard-grid {
+.step-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(460px, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 0.38fr);
   gap: 24px;
   align-items: start;
 }
+
+.step-pages,
+.step-page { min-width: 0; }
+
+.activity-panel { position: sticky; top: 20px; }
+
+.key-guide {
+  margin-top: 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f8faf8;
+}
+
+.key-guide h3 { margin: 0 0 10px; font-size: 15px; }
+.key-guide p,
+.panel-note { color: var(--muted); font-size: 12px; line-height: 1.75; }
+.key-guide p { margin: 0 0 10px; }
+.key-guide p:last-child { margin-bottom: 0; }
+.key-guide code { overflow-wrap: anywhere; }
+.panel-note { margin: -12px 0 18px; }
+
+.step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.step-actions button:not(.primary-button) {
+  min-height: 44px;
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  color: var(--green);
+  background: white;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.step-actions .primary-button { width: auto; min-width: 260px; }
 
 .input-column,
 .result-column {
@@ -521,7 +568,7 @@ button:disabled {
 }
 
 .result-panel {
-  min-height: 720px;
+  min-height: 0;
 }
 
 .verification-badge {
@@ -799,9 +846,11 @@ footer {
     gap: 35px;
   }
 
-  .dashboard-grid {
+  .step-layout {
     grid-template-columns: 1fr;
   }
+
+  .activity-panel { position: static; }
 
   .result-panel {
     min-height: 0;
@@ -840,7 +889,7 @@ footer {
   }
 
   .workflow-line {
-    width: 38px;
+    width: 20px;
   }
 
   .panel {
@@ -863,4 +912,8 @@ footer {
   footer {
     flex-direction: column;
   }
+
+  .step-actions { flex-direction: column; }
+  .step-actions button,
+  .step-actions .primary-button { width: 100%; }
 }
