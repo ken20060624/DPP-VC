@@ -29,7 +29,7 @@
 
   <h1>🛡️ DPP-VC 數位產品護照憑證簽發與驗證</h1>
 
-  <!-- 1. 商品預覽 (包含 QR Code 區塊與 PDF 按鈕) -->
+  <!-- 1. 商品預覽 -->
   <div class="card">
     <div class="product-grid">
       <div>
@@ -45,19 +45,17 @@
         
         <div class="btn-group">
           <button class="btn-blue" onclick="issueVC()">✍️ 簽發 VC (POST /issue)</button>
-          <a href="public/manuals/LF-02-manual.pdf" target="_blank" style="text-decoration: none;">
-            <button type="button" class="btn-slate">📄 查看官方產品說明書 (PDF)</button>
+          <a href="./manuals/LF-02-manual.pdf" target="_blank" style="text-decoration: none;">
+            <button type="button" class="btn-slate">📄 查看官方產品說明書</button>
           </a>
         </div>
       </div>
 
       <!-- 讀取實體 QR Code 圖片 -->
       <div class="qr-box">
-        <!-- 嘗試讀取本地檔案，如果失敗自動切換為線上生成，確保 100% 顯示 -->
-        <img id="qrImage" 
-             src="./public/qrcodes/FAN-001_FAN%202026-001.png" 
-             alt="GS1 QR Code" 
-             onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://dpp.lapo.com.tw/01/04710000000000/21/SN202603001';">
+      <img id="qrImage" 
+            src="public/qrcodes/FAN-001_FAN-2026-001.png" 
+            alt="./public/qrcodes/FAN-001_FAN-2026-001.png" />
         <div style="font-size: 12px; color: #64748b; margin-top: 6px;">掃瞄實體護照 QR Code</div>
       </div>
     </div>
@@ -91,7 +89,7 @@
       brand: "LaPO",
       countryOfOrigin: "TW",
       documentation: {
-        userManual: "./public/manuals/LF-02-manual.pdf",
+        userManual: "./manuals/LF-02-manual.pdf",
         officialProductPage: "https://www.lapo.com.tw/zh-TW/products/vortexfan"
       },
       batteryComponent: {
@@ -176,7 +174,7 @@
           vc.credentialSubject.batteryComponent.capacityMah = 9999;
           area.value = JSON.stringify(vc, null, 2);
           document.getElementById('verifyResult').style.display = 'none';
-          alert('⚠️️ 已將電池容量從 5100mAh 竄改為 9999mAh！\n請點擊「🔍 驗證憑證 (POST /verify)」觀察驗證結果！');
+          alert('⚠ 已將電池容量從 5100mAh 竄改為 9999mAh！\n請點擊「🔍 驗證憑證 (POST /verify)」觀察驗證結果！');
         } else {
           alert('找不到 batteryComponent 欄位');
         }
