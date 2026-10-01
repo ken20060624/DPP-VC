@@ -8,8 +8,9 @@
     h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
     .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
     .product-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: center; }
-    .qr-box { text-align: center; background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px dashed #cbd5e1; }
-    .qr-box img { max-width: 140px; height: auto; border-radius: 4px; }
+    .qr-box { text-align: center; background: #f1f5f9; padding: 16px; border-radius: 8px; border: 1px dashed #cbd5e1; }
+    /* 👇 修正：放大尺寸、加入純白背景與 Padding (安全白邊)，確保手機相機絕對能掃到 */
+    .qr-box img { max-width: 180px; width: 100%; height: auto; background-color: #ffffff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
     button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
     button:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-blue { background: #2563eb; color: white; }
@@ -45,7 +46,7 @@
         
         <div class="btn-group">
           <button class="btn-blue" onclick="issueVC()">✍️ 簽發 VC (POST /issue)</button>
-          <a href="./manuals/LF-02-manual.pdf" target="_blank" style="text-decoration: none;">
+          <a href="../../public/manuals/LF-02-manual.pdf" target="_blank" style="text-decoration: none;">
             <button type="button" class="btn-slate">📄 查看官方產品說明書</button>
           </a>
         </div>
@@ -53,9 +54,10 @@
 
       <!-- 讀取實體 QR Code 圖片 -->
       <div class="qr-box">
+      <!-- 👇 修正：加上 ../../ 跳回主目錄抓圖片，避免 GitHub Pages 找不到檔案 -->
       <img id="qrImage" 
-            src="public/qrcodes/FAN-001_FAN-2026-001.png" 
-            alt="./public/qrcodes/FAN-001_FAN-2026-001.png" />
+            src="../../public/qrcodes/FAN-001_FAN-2026-001.png" 
+            alt="FAN-001 QR Code" />
         <div style="font-size: 12px; color: #64748b; margin-top: 6px;">掃瞄實體護照 QR Code</div>
       </div>
     </div>
@@ -79,6 +81,7 @@
   </div>
 
   <script>
+    // 💡 隊友注意：Demo 當天如果有使用 Ngrok 外部網址，請將這裡的 localhost 換成 ngrok 網址！
     const API_BASE_URL = 'http://localhost:3000';
 
     // 原始商品資料
